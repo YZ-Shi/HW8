@@ -1,2 +1,2 @@
 # HW8
-Exercise using firebase with CRUD functionalities
+Exercise using firebase with CRUD functionalities and Github
