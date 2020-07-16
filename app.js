@@ -3,8 +3,7 @@ class Task {
     this.id = id;
     this.title = title;
     this.sortKey = 0;
-    /*     this.priorityId = "";
-    this.priority = {}; */
+    this.priorityId = "";
   }
 }
 
@@ -13,7 +12,7 @@ class TaskListPage {
     this.tasks = [];
     this.priorities = [];
 
-    firebase
+    /* firebase
       .auth()
       .createUserWithEmailAndPassword("d.yzshi@gmail.com", "scotty")
       .then((user) => {
@@ -21,7 +20,7 @@ class TaskListPage {
       })
       .catch((error) => {
         console.log(error);
-      });
+      });  */
 
     /*     const massUpdates = {
       '/tasks/some-id-1': {title: "Task 1"},
@@ -43,18 +42,21 @@ class TaskListPage {
       const task = new Task(id, title, priority);
     } */
 
-    firebase.database().ref("priorities").once("value", (prioritiesSnapshop) => {
-      const allPriorities = prioritiesSnapshot.val();
-      Object.keys(allPriorities).forEach(priorityId => {
-        const priorityData = allPriorities[priorityId];
-        const priority = {
-          id: priorityId,
-          name: priorityData.name,
-          color: priorityData.color
-        };
-        this.priorities.push(priority);
-      })
-    });
+    firebase
+      .database()
+      .ref("priorities")
+      .once("value", (prioritiesSnapshot) => {
+        const allPriorities = prioritiesSnapshot.val();
+        Object.keys(allPriorities).forEach((priorityId) => {
+          const priorityData = allPriorities[priorityId];
+          const priority = {
+            id: priorityId,
+            name: priorityData.name,
+            color: priorityData.color,
+          };
+          this.priorities.push(priority);
+        });
+      });
 
     firebase
       .database()
@@ -65,8 +67,10 @@ class TaskListPage {
           const taskData = allTasks[taskId];
           const task = new Task(taskId, taskData.title);
 
-          if(taskData.priorityId) {
-            const priority = this.priorities.find(priority => priority.id == taskData.priorityId);
+          if (taskData.priorityId) {
+            const priority = this.priorities.find(
+              (priority) => priority.id == taskData.priorityId
+            );
             task.priority = priority;
           }
 
@@ -80,6 +84,14 @@ class TaskListPage {
           <td>
           <button data-action="edit" data-task-id="${task.id}" class="btn btn-primary">Edit</button>
           <button data-action="delete" data-task-id="${task.id}" class="btn btn-danger">Delete</button>
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="priorityBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Priority
+  </button>
+  <div class="dropdown-menu" aria-labelledby="priorityBtn">
+  <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="high" type="button">High</button>
+  <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="medium" type="button">Medium</button>
+  <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="low" type="button">Low</button>
+  </div>
           </td>
           `;
           taskListElement.appendChild(row);
@@ -173,7 +185,7 @@ class TaskListPage {
     const sortKey = this.tasks.length + 1;
     const newTaskSnapshot = firebase.database().ref("tasks").push({
       title: title,
-      sortKey: sortKey
+      sortKey: sortKey,
     });
     const taskId = newTaskSnapshot.key;
 
@@ -265,6 +277,21 @@ class TaskListPage {
     if (!existingRow) return;
     existingRow.remove();
   }
+
+  setPriority(taskId, priority) {
+    const task = this.tasks.find((task) => task.id == taskId); // return the first element; use filter((task) => tasks.sortKey == 5) if looking for an array
+    if (!task) return;
+
+    const existingRow = document.querySelector(`tr[data-task-id="${task.id}"]`);
+    if (priority == "high") {
+      existingRow.setAttribute("class", "table-danger");
+      firebase.database().ref("tasks").child(taskId).update({priorityId: "H"});
+    } else if (priority == "medium") {
+      existingRow.setAttribute("class", "table-warning");
+    } else if (priority == "low") {
+      existingRow.setAttribute("class", "table-success");
+    }
+  }
 }
 
 const taskListPage = new TaskListPage();
@@ -289,8 +316,44 @@ document.getElementById("taskList").addEventListener("click", (e) => {
   } else if (action == "delete") {
     const taskId = e.target.getAttribute("data-task-id");
     taskListPage.delete(taskId);
+  } else if (action == "priority") {
+    const taskId = e.target.getAttribute("data-task-id");
+    const priority = e.target.getAttribute("data-task-priority");
+    taskListPage.setPriority(taskId, priority);
   }
 });
+
+/* document.getElementById("taskList").addEventListener("load", () => {
+  document.getElementById("welcome-page").style.display = "block";
+  console.log("open");
+}); 
+
+document.getElementById("register").addEventListener("click", () => {
+  document.getElementById("welcome-page").style.display = "none";
+  console.log("close");
+});  */
+//let loaded = false;
+
+/* function showPage() {
+  debugger;
+  if (loaded) return;
+  else loaded = true;
+  //debugger;
+  document.getElementById("welcome-page").style.opacity = "100%";
+  //debugger;
+  console.log("open");
+}
+function hidePage() {
+  //debugger;
+  document.getElementById("welcome-page").style.opacity = "0%";
+  //debugger;
+  console.log("hide");
+} */
+/* function exit() {
+  //document.getElementById("welcome-page").style.display = "none";
+  document.getElementById("welcome-page").innerHTML = ``;
+  console.log("yes");
+} */
 
 // function getData2(prop1, prop2) {
 
