@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Day 5</title>
+    <title>Task List</title>
 
     <link
       rel="stylesheet"
@@ -9,11 +9,74 @@
       integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <div class="container">
-      <div class="card">
+    <!--Navigation Bar-->
+    <div>
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a class="nav-link" id="nav-bar-register" href="#">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-bar-login" href="#">Log In</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-bar-list" href="#">Task List</a>
+        </li>
+        </li>
+      </ul>
+    </div>
+
+    <!--Login Page-->
+    <div class="card d-block" id="login-page">
+      <div class="card-body">
+        <h3 class="card-title text-center">Login</h3>
+        <form>
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" class="form-control" id="login-email" aria-describedby="emailHelp">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" class="form-control" id="login-password">
+          </div>
+          <small id="login-alert" class="form-text text-danger"></small>
+        </form>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary" id="login-btn">Submit</button>
+          <button type="button" class="btn btn-secondary" id="register-btn">Sign Up</button>
+        </div>
+      </div>
+    </div>
+
+    <!--Registration Page-->
+    <div class="card d-none" id="registration-page">
+      <div class="card-body">
+        <h3 class="card-title text-center">Register</h3>
+        <form>
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" class="form-control" id="reg-email" aria-describedby="emailHelp">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" class="form-control" id="reg-password">
+          </div>
+          <small id="reg-alert" class="form-text text-danger"></small>
+        </form>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary" id="complete-reg-btn">Submit</button>
+          <br>
+          <a id="back-to-login" href=#>Back to login</a>
+        </div>
+      </div>
+    </div>
+
+    <!--Main List Page-->
+    <div class="container" id="container">
+      <div class="card d-none" id="task-list-page">
         <div class="card-body">
           <h5>Task List</h5>
           <div class="form-group">
@@ -24,7 +87,47 @@
                 type="text"
                 placeholder="the task..."
               />
+
               <div class="input-group-append">
+                <button
+                  class="btn btn-outline-info dropdown-toggle"
+                  type="button"
+                  id="addPriority"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Priority
+                </button>
+                <div class="dropdown-menu" id="priority-dropdown" aria-labelledby="priorityBtn">
+                  <button
+                    class="dropdown-item"
+                    data-action="priority"
+                    data-task-id="${task.id}"
+                    data-task-priority="high"
+                    type="button"
+                  >
+                    High
+                  </button>
+                  <button
+                    class="dropdown-item"
+                    data-action="priority"
+                    data-task-id="${task.id}"
+                    data-task-priority="medium"
+                    type="button"
+                  >
+                    Medium
+                  </button>
+                  <button
+                    class="dropdown-item"
+                    data-action="priority"
+                    data-task-id="${task.id}"
+                    data-task-priority="low"
+                    type="button"
+                  >
+                    Low
+                  </button>
+                </div>
                 <button
                   id="addBtn"
                   type="button"
@@ -70,7 +173,7 @@
 
     <!-- TODO: Add SDKs for Firebase products that you want to use
      https://firebase.google.com/docs/web/setup#available-libraries -->
-    
+
     <script>
       // Your web app's Firebase configuration
       var firebaseConfig = {
