@@ -1,9 +1,16 @@
+let user;
+let uid;
+let taskListPage;
+const priorityBtn = document.getElementById("addPriority");
+const priorityMenu = document.getElementById("priority-dropdown");
+
 class Task {
-  constructor(id, title, sortKey = 0) {
-    this.id = id;
+  constructor(id, title, sortKey = 0, priorityId, uid) {
+    this.id = id; // firebase key (randomized)
     this.title = title;
     this.sortKey = 0;
-    this.priorityId = "";
+    this.priorityId = priorityId;
+    this.uid = uid;
   }
 }
 
@@ -11,36 +18,6 @@ class TaskListPage {
   constructor() {
     this.tasks = [];
     this.priorities = [];
-
-    /* firebase
-      .auth()
-      .createUserWithEmailAndPassword("d.yzshi@gmail.com", "scotty")
-      .then((user) => {
-        console.log("Once a user has been created", user)
-      })
-      .catch((error) => {
-        console.log(error);
-      });  */
-
-    /*     const massUpdates = {
-      '/tasks/some-id-1': {title: "Task 1"},
-      '/tasls/some-id-2': {title: "Task 2"}
-    };
-
-    if (task1.something == true) {
-      massUpdates['/tasks/1'] = {title: "Something cool"};
-    }
-
-    firebase.database().ref().update(massUpdates); */
-
-    //1. Fetch all priorities from firebase
-    //2. Loop through all firebases tasks
-    /*     for (var k = 0; k < fbTasksDb.length; k++) {
-      const priorityId = fbTasksDb[k].priorityId;
-      //    look up the priority by ID
-      const priority = {}; // findById();
-      const task = new Task(id, title, priority);
-    } */
 
     firebase
       .database()
@@ -65,13 +42,19 @@ class TaskListPage {
         const allTasks = snapshot.val();
         Object.keys(allTasks).forEach((taskId) => {
           const taskData = allTasks[taskId];
-          const task = new Task(taskId, taskData.title);
+          const task = new Task(
+            taskId,
+            taskData.title,
+            taskData.sortKey,
+            taskData.priorityId
+          );
+          //console.log(task.priorityId);
 
           if (taskData.priorityId) {
             const priority = this.priorities.find(
               (priority) => priority.id == taskData.priorityId
             );
-            task.priority = priority;
+            task.priorityId = priority;
           }
 
           this.tasks.push(task);
@@ -79,118 +62,50 @@ class TaskListPage {
           const taskListElement = document.getElementById("taskList");
           const row = document.createElement("tr");
           row.setAttribute("data-task-id", task.id);
+          //console.log(task.id);
           row.innerHTML = `
           <td>${task.title}</td>
           <td>
           <button data-action="edit" data-task-id="${task.id}" class="btn btn-primary">Edit</button>
           <button data-action="delete" data-task-id="${task.id}" class="btn btn-danger">Delete</button>
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="priorityBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Priority
-  </button>
-  <div class="dropdown-menu" aria-labelledby="priorityBtn">
-  <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="high" type="button">High</button>
-  <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="medium" type="button">Medium</button>
-  <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="low" type="button">Low</button>
-  </div>
+          <button class="btn btn-outline-info dropdown-toggle" type="button" id="priorityBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Priority
+          </button>
+          <div class="dropdown-menu" aria-labelledby="priorityBtn">
+          <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="high" type="button">High</button>
+          <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="medium" type="button">Medium</button>
+          <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="low" type="button">Low</button>
+          </div>
           </td>
           `;
+          console.log(task.priorityId);
+          if (task.priorityId) {
+            if (task.priorityId.id == "H") {
+              row.setAttribute("class", "table-danger");
+            } else if (task.priorityId.id == "M") {
+              row.setAttribute("class", "table-warning");
+            } else if (task.priorityId.id == "L") {
+              row.setAttribute("class", "table-success");
+            }
+          }
           taskListElement.appendChild(row);
         });
       });
-
-    //Create or Update (PUT)
-    /*     const accountsDb = db.ref('accounts');
-    accountsDb.set({
-      property1: "Test",
-      property2: "testing..."
-    }); */
-
-    // db.ref("new-keys").set({test: "test"});
-    // db.ref("new-keys-2").set({test: "testing..."});
-
-    // const massUpdate = {};
-    // massUpdate['/new-keys-zz'] = {test: "lolol"};
-    // massUpdate['/new-keys-2-zz'] = {test: "lololol..."};
-    // console.log(massUpdate);
-
-    // const massUpdatez = {
-    //   "/new-keys": {test: "test"},
-    //   "/new-keys-2": {test: "testing..."}
-    // };
-
-    // db.ref().update(massUpdate);
-
-    // db.ref("accounts/property1").set("lololol");
-
-    // const taskId = "-MC8Fx4kQmlyOns9hLQA";
-    // db.ref("tasks/" + taskId).remove();
-    // db.ref("tasks").child(taskId).remove();
-
-    // const newTaskRef = db.ref("tasks").push({
-    //   title: "new title"
-    // });
-    // console.log(newTaskRef.key);
-
-    // var newTaskKey = firebase.database().ref().child('tasks').push().key;
-    // console.log(newTaskKey);
-
-    // firebase.database().ref("tasks").child(newTaskKey).set({
-    //   title: "My new task..."
-    // });
-
-    // firebase.database().ref("tasks").on("value", function(snapshot) {
-    //   const data = snapshot.val();
-    //   console.log("Repeated: ", data);
-    // });
-
-    // firebase.database().ref("tasks").once("value", function(snapshot) {
-    //   const data = snapshot.val();
-    //   console.log("Once: ", data);
-    // });
-
-    // const url = "https://ix-2020-green-miki.firebaseio.com/tasks.json";
-    // fetch(url)
-    //   .then((response) => {
-    //     response
-    //       .json()
-    //       .then((data) => {
-    //         // const keys = Object.keys(data);
-    //         // console.log(keys);
-    //         // console.log(data["task-1"]);
-
-    //         Object.keys(data).forEach(key => {
-    //           const taskData = data[key];
-    //           console.log(taskData);
-    //           const task = new Task(key, taskData.title);
-    //           this.tasks.push(task);
-
-    //           const taskListElement = document.getElementById("taskList");
-    //           const row = document.createElement("tr");
-    //           row.setAttribute("data-task-id", task.id);
-    //           row.innerHTML = `
-    //           <td>${task.title}</td>
-    //           <td><button data-action="edit" data-task-id="${task.id}" class="btn btn-primary">Edit</button></td>
-    //           `;
-    //           taskListElement.appendChild(row);
-    //         });
-
-    //         // const arrTaskData = Object.values(data);
-    //       })
-    //       .catch((err) => console.log(err));
-    //   })
-    //   .catch((err) => console.log(err));
   }
 
-  addTask(title) {
+  addTask(title, priorityId, uid) {
     const sortKey = this.tasks.length + 1;
     const newTaskSnapshot = firebase.database().ref("tasks").push({
       title: title,
       sortKey: sortKey,
+/*       priorityId: priorityId,
+      uid: uid */
     });
     const taskId = newTaskSnapshot.key;
 
     //const taskId = this.tasks.length + 1;
-    const task = new Task(taskId, title, sortKey);
+    console.log(uid);
+    const task = new Task(taskId, title, sortKey, priorityId, uid);
     this.tasks.push(task);
 
     const taskListElement = document.getElementById("taskList");
@@ -201,30 +116,48 @@ class TaskListPage {
       <td>
       <button data-action="edit" data-task-id="${task.id}" class="btn btn-primary">Edit</button>
       <button data-action="delete" data-task-id="${task.id}" class="btn btn-danger">Delete</button>
+      <button class="btn btn-outline-info dropdown-toggle" type="button" id="priorityBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Priority
+      </button>
+      <div class="dropdown-menu" aria-labelledby="priorityBtn">
+      <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="high" type="button">High</button>
+      <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="medium" type="button">Medium</button>
+      <button class="dropdown-item" data-action="priority" data-task-id="${task.id}" data-task-priority="low" type="button">Low</button>
+      </div>
       </td>
       `;
-    taskListElement.appendChild(row);
-    document.getElementById("task").value = "";
 
-    /*     const url = "https://test713-4b7bd.firebaseio.com";
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify(task),
-    })
-      .then((response) => {
-        response
-          .json()
-          .then((data) => {
-            console.log(data);
-            const taskId = data.name;
-          })
-          .catch((err) => console.log(err));
-      })
-      .catch((err) => console.log(err)); */
+    if (priorityId == "H") {
+      row.setAttribute("class", "table-danger");
+      firebase
+        .database()
+        .ref("tasks")
+        .child(taskId)
+        .update({ priorityId: "H" });
+    } else if (priorityId == "M") {
+      row.setAttribute("class", "table-warning");
+      firebase
+        .database()
+        .ref("tasks")
+        .child(taskId)
+        .update({ priorityId: "M" });
+    } else if (priorityId == "L") {
+      row.setAttribute("class", "table-success");
+      firebase
+        .database()
+        .ref("tasks")
+        .child(taskId)
+        .update({ priorityId: "L" });
+    }
+    taskListElement.appendChild(row);
+    firebase.database().ref("tasks").child(taskId).set({
+      title: title,
+      id: taskId,
+      //priority: task.
+      priorityId: priorityId,
+      uid: uid
+    });
+    document.getElementById("task").value = "";
   }
 
   startEdittingTask(taskId) {
@@ -241,20 +174,10 @@ class TaskListPage {
   }
 
   saveTaskTitle(taskId, taskTitle) {
-    // this.tasks.forEach(function (task) {
-    //   if (task.id == taskId) {
-    //   }
-    // });
-
-    // const task = this.tasks.find(function (task) {
-    //   if (task.id == taskId) return true;
-    // });
-
     const task = this.tasks.find((task) => task.id == taskId);
     if (!task) return;
 
     task.title = taskTitle;
-
     firebase.database().ref("tasks").child(taskId).set(task); // same as firebase.database().ref('tasks'/ + taskId)
 
     const existingRow = document.querySelector(`tr[data-task-id="${task.id}"]`);
@@ -285,33 +208,88 @@ class TaskListPage {
     const existingRow = document.querySelector(`tr[data-task-id="${task.id}"]`);
     if (priority == "high") {
       existingRow.setAttribute("class", "table-danger");
-      firebase.database().ref("tasks").child(taskId).update({priorityId: "H"});
+      firebase
+        .database()
+        .ref("tasks")
+        .child(taskId)
+        .update({ priorityId: "H" });
     } else if (priority == "medium") {
       existingRow.setAttribute("class", "table-warning");
+      firebase
+        .database()
+        .ref("tasks")
+        .child(taskId)
+        .update({ priorityId: "M" });
     } else if (priority == "low") {
       existingRow.setAttribute("class", "table-success");
+      firebase
+        .database()
+        .ref("tasks")
+        .child(taskId)
+        .update({ priorityId: "L" });
     }
   }
 }
 
-const taskListPage = new TaskListPage();
+// Set priority
+// const taskListPage = new TaskListPage();
+priorityMenu.addEventListener("click", (e) => {
+  console.log(e.target.innerText);
+  if (e.target.innerText == "High") {
+    priorityBtn.textContent = "High";
+  } else if (e.target.innerText == " Medium") {
+    priorityBtn.textContent = "Medium";
+  } else if (e.target.innerText == "Low") {
+    priorityBtn.textContent = "Low";
+  }
+});
 
+//Switch to register page
+document.getElementById("register-btn").addEventListener("click", function (e) {
+  document.getElementById("login-page").setAttribute("class", "card d-none");
+  document
+    .getElementById("registration-page")
+    .setAttribute("class", "card d-block");
+});
+
+//Switch back to login
+document
+  .getElementById("back-to-login")
+  .addEventListener("click", function (e) {
+    document.getElementById("login-page").setAttribute("class", "card d-block");
+    document
+      .getElementById("registration-page")
+      .setAttribute("class", "card d-none");
+  });
+
+// Add/submit edited task to the list
 document.getElementById("addBtn").addEventListener("click", (e) => {
   const taskInputElement = document.getElementById("task");
   const taskTitle = taskInputElement.value;
+
+  let priority;
+  if (priorityBtn.textContent == "High") {
+    priority = "H";
+  } else if (priorityBtn.textContent == "Medium") {
+    priority = "M";
+  } else if (priorityBtn.textContent == "Low") {
+    priority = "L";
+  }
 
   const existingTaskId = taskInputElement.getAttribute("data-task-id");
   if (existingTaskId) {
     taskListPage.saveTaskTitle(existingTaskId, taskTitle);
   } else {
-    taskListPage.addTask(taskTitle);
+    taskListPage.addTask(taskTitle, priority, uid);
   }
 });
 
+// Edit/delite/change priority of task
 document.getElementById("taskList").addEventListener("click", (e) => {
   const action = e.target.getAttribute("data-action");
   if (action == "edit") {
     const taskId = e.target.getAttribute("data-task-id");
+    console.log(taskId);
     taskListPage.startEdittingTask(taskId);
   } else if (action == "delete") {
     const taskId = e.target.getAttribute("data-task-id");
@@ -323,73 +301,78 @@ document.getElementById("taskList").addEventListener("click", (e) => {
   }
 });
 
-/* document.getElementById("taskList").addEventListener("load", () => {
-  document.getElementById("welcome-page").style.display = "block";
-  console.log("open");
-}); 
+// Login
+document.getElementById("login-btn").addEventListener("click", (e) => {
+  const emailElement = document.getElementById("login-email");
+  const passwordElement = document.getElementById("login-password");
+  const email = emailElement.value;
+  const password = passwordElement.value;
 
-document.getElementById("register").addEventListener("click", () => {
-  document.getElementById("welcome-page").style.display = "none";
-  console.log("close");
-});  */
-//let loaded = false;
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
+    .then((e) => {
+      user = firebase.auth().currentUser;
+      uid = user.uid;
+      taskListPage = new TaskListPage();
+      document
+        .getElementById("login-page")
+        .setAttribute("class", "card d-none");
+      document
+        .getElementById("task-list-page")
+        .setAttribute("class", "card d-block");
+    })
+    .catch((err) => {
+      if (err.code = "auth/wrong-password") {
+        document.getElementById("login-alert").innerHTML = err.message;
+      }
+    });
+});
 
-/* function showPage() {
-  debugger;
-  if (loaded) return;
-  else loaded = true;
-  //debugger;
-  document.getElementById("welcome-page").style.opacity = "100%";
-  //debugger;
-  console.log("open");
-}
-function hidePage() {
-  //debugger;
-  document.getElementById("welcome-page").style.opacity = "0%";
-  //debugger;
-  console.log("hide");
-} */
-/* function exit() {
-  //document.getElementById("welcome-page").style.display = "none";
-  document.getElementById("welcome-page").innerHTML = ``;
-  console.log("yes");
-} */
+// Register
+document.getElementById("complete-reg-btn").addEventListener("click", (e) => {
+  const emailElement = document.getElementById("reg-email");
+  const passwordElement = document.getElementById("reg-password");
+  const email = emailElement.value;
+  const password = passwordElement.value;
 
-// function getData2(prop1, prop2) {
+  firebase
+    .auth()
+    .createUserWithEmailAndPassword(email, password)
+    .then((e) => {
+      user = firebase.auth().currentUser;
+      uid = user.uid;
+      taskListPage = new TaskListPage();
+      document
+        .getElementById("registration-page")
+        .setAttribute("class", "card d-none");
+      document
+        .getElementById("task-list-page")
+        .setAttribute("class", "card d-block");
+        //debugger;
+    })
+    .catch((err) => {
+      // Email already in use
+      if (err.code = "auth/email-already-in-use") {
+        document.getElementById("reg-alert").innerHTML = err.message;
+      }
+    });
+});
 
-// }
+document.getElementById("nav-bar-register").addEventListener("click", (e) => {
+  document.getElementById("login-page").setAttribute("class", "card mt-4 d-none");
+  document.getElementById("task-list-page").setAttribute("class", "card mt-4 d-none");
+  document.getElementById("registration-page").setAttribute("class", "card mt-4 d-block");
+});
 
-// function getData(propertyHolder) {
-//     //propertyHolder.prop1
-//     //propertyHolder.prop2
-// }
+document.getElementById("nav-bar-login").addEventListener("click", function(e) {
+  document.getElementById("login-page").setAttribute("class", "card mt-4 d-block");
+  document.getElementById("task-list-page").setAttribute("class", "card mt-4 d-none");
+  document.getElementById("registration-page").setAttribute("class", "card mt-4 d-none");
+});
 
-// function getData() {
-//     this.prop1 = "a";
-//     this.prop2 = "b";
-
-//     getData2(this.prop1, this.prop2);
-// }
-
-// const MyDatabase = {
-//   key1: "value abc",
-//   key2: "",
-//   key3: 5,
-//   key4: {
-//     subKey1: "abc",
-//     subKey2: {
-//       subSubKey1: "abc"
-//     }
-//   }
-// }
-
-/* const json = JSON.stringify(MyDatabase);
-{
-  "key1": "value abc",
-  "key2": "",
-  "key3": 5
-}
-
-const back = JSON.parse(json); */
-
-// HTTP GET MyDatabase/key4/subKey1
+document.getElementById("nav-bar-list").addEventListener("click", function(e) {
+  document.getElementById("task-list-page").setAttribute("class", "card mt-4 d-block");
+  document.getElementById("login-page").setAttribute("class", "card mt-4 d-none");
+  document.getElementById("registration-page").setAttribute("class", "card mt-4 d-none");
+});

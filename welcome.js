@@ -1,6 +1,6 @@
-/* document.getElementById("register").addEventListener("click", (e) => {
+document.getElementById("register").addEventListener("click", (e) => {
 
-}) */
+})
 /* firebase
       .auth()
       .createUserWithEmailAndPassword("d.yzshi@gmail.com", "scotty")

@@ -3,13 +3,6 @@
   <head>
     <title>Task List</title>
 
-    <script src="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.js"></script>
-    <link
-      type="text/css"
-      rel="stylesheet"
-      href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css"
-    />
-
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
@@ -20,12 +13,70 @@
   </head>
 
   <body>
-    <h1>Welcome to My Awesome App</h1>
-    <div id="firebaseui-auth-container"></div>
-    <div id="loader">Loading...</div>
+    <!--Navigation Bar-->
+    <div>
+      <ul class="nav nav-tabs card-header-tabs">
+        <li class="nav-item">
+          <a class="nav-link" id="nav-bar-register" href="#">Register</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-bar-login" href="#">Log In</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="nav-bar-list" href="#">Task List</a>
+        </li>
+        </li>
+      </ul>
+    </div>
 
+    <!--Login Page-->
+    <div class="card d-block" id="login-page">
+      <div class="card-body">
+        <h3 class="card-title text-center">Login</h3>
+        <form>
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" class="form-control" id="login-email" aria-describedby="emailHelp">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" class="form-control" id="login-password">
+          </div>
+          <small id="login-alert" class="form-text text-danger"></small>
+        </form>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary" id="login-btn">Submit</button>
+          <button type="button" class="btn btn-secondary" id="register-btn">Sign Up</button>
+        </div>
+      </div>
+    </div>
+
+    <!--Registration Page-->
+    <div class="card d-none" id="registration-page">
+      <div class="card-body">
+        <h3 class="card-title text-center">Register</h3>
+        <form>
+          <div class="form-group">
+            <label for="login-email">Email</label>
+            <input type="email" class="form-control" id="reg-email" aria-describedby="emailHelp">
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" class="form-control" id="reg-password">
+          </div>
+          <small id="reg-alert" class="form-text text-danger"></small>
+        </form>
+        <div class="text-center">
+          <button type="submit" class="btn btn-primary" id="complete-reg-btn">Submit</button>
+          <br>
+          <a id="back-to-login" href=#>Back to login</a>
+        </div>
+      </div>
+    </div>
+
+    <!--Main List Page-->
     <div class="container" id="container">
-      <div class="card">
+      <div class="card d-none" id="task-list-page">
         <div class="card-body">
           <h5>Task List</h5>
           <div class="form-group">
@@ -36,7 +87,47 @@
                 type="text"
                 placeholder="the task..."
               />
+
               <div class="input-group-append">
+                <button
+                  class="btn btn-outline-info dropdown-toggle"
+                  type="button"
+                  id="addPriority"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Priority
+                </button>
+                <div class="dropdown-menu" id="priority-dropdown" aria-labelledby="priorityBtn">
+                  <button
+                    class="dropdown-item"
+                    data-action="priority"
+                    data-task-id="${task.id}"
+                    data-task-priority="high"
+                    type="button"
+                  >
+                    High
+                  </button>
+                  <button
+                    class="dropdown-item"
+                    data-action="priority"
+                    data-task-id="${task.id}"
+                    data-task-priority="medium"
+                    type="button"
+                  >
+                    Medium
+                  </button>
+                  <button
+                    class="dropdown-item"
+                    data-action="priority"
+                    data-task-id="${task.id}"
+                    data-task-priority="low"
+                    type="button"
+                  >
+                    Low
+                  </button>
+                </div>
                 <button
                   id="addBtn"
                   type="button"
@@ -97,38 +188,6 @@
       };
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
-      var ui = new firebaseui.auth.AuthUI(firebase.auth());
-      ui.start("#firebaseui-auth-container", {
-        signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
-        // Other config options...
-      });
-      var uiConfig = {
-        callbacks: {
-          signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-            // User successfully signed in.
-            // Return type determines whether we continue the redirect automatically
-            // or whether we leave that to developer to handle.
-            return true;
-          },
-          uiShown: function () {
-            // The widget is rendered.
-            // Hide the loader.
-            document.getElementById("loader").style.display = "none";
-          },
-        },
-        // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-        signInFlow: "popup",
-        signInSuccessUrl: "<url-to-redirect-to-on-success>",
-        signInOptions: [
-          // Leave the lines as is for the providers you want to offer your users.
-          firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-          firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-          firebase.auth.GithubAuthProvider.PROVIDER_ID,
-          firebase.auth.EmailAuthProvider.PROVIDER_ID,
-          firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-        ],
-      };
     </script>
 
     <script src="app.js"></script>
